@@ -1,0 +1,55 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="numpy" />
+          <option value="autograd" />
+          <option value="scipy" />
+          <option value="networkx" />
+          <option value="pandas" />
+          <option value="xlwt" />
+          <option value="xlrd" />
+          <option value="highspy" />
+          <option value="matplotlib" />
+          <option value="openpyxl" />
+          <option value="chardet" />
+          <option value="scikit-learn" />
+          <option value="geopy" />
+          <option value="nose" />
+          <option value="h5py" />
+          <option value="numba" />
+          <option value="PySide6" />
+          <option value="pyproj" />
+          <option value="pyarrow" />
+          <option value="fastparquet" />
+          <option value="windpowerlib" />
+          <option value="pvlib" />
+          <option value="requests" />
+          <option value="urllib3" />
+          <option value="pytest" />
+          <option value="pulp" />
+          <option value="rdflib" />
+          <option value="pymoo" />
+          <option value="fastapi" />
+          <option value="starlette" />
+          <option value="uvicorn" />
+          <option value="websockets" />
+          <option value="cryptography" />
+          <option value="opencv-python" />
+          <option value="setuptools" />
+          <option value="packaging" />
+          <option value="torch" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyStubPackagesAdvertiser" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="scipy" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
