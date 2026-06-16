@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HomeArxiv - Gestor de Papers</title>
+<title>HomeArxiv</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -12,179 +12,469 @@
   }
   .header {
     background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff;
-    padding: 1rem 2rem; display: flex; align-items: center; gap: 1.5rem;
+    padding: .7rem 1.5rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
     box-shadow: 0 2px 8px rgba(0,0,0,.15);
   }
-  .header h1 { font-size: 1.4rem; font-weight: 600; }
-  .header .subtitle { color: #a0aec0; font-size: .85rem; }
+  .header h1 { font-size: 1.3rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .header h1:hover { opacity: .8; }
+  .header .subtitle { color: #a0aec0; font-size: .8rem; }
+  .header .spacer { margin-left: auto; display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
   .header button {
-    margin-left: auto; background: #2d6a4f; color: #fff; border: none;
-    padding: .5rem 1rem; border-radius: 6px; cursor: pointer; font-size: .85rem;
+    background: #2d6a4f; color: #fff; border: none;
+    padding: .4rem .8rem; border-radius: 6px; cursor: pointer; font-size: .8rem;
   }
   .header button:hover { background: #40916c; }
-  .container { max-width: 1280px; margin: 0 auto; padding: 1.5rem 2rem; }
+  .header button:disabled { opacity: .5; cursor: not-allowed; }
+  .header select {
+    background: #1e293b; color: #e2e8f0; border: 1px solid #475569;
+    padding: .35rem .5rem; border-radius: 6px; font-size: .8rem; cursor: pointer;
+  }
+  .container { max-width: 1280px; margin: 0 auto; padding: 1rem 1.5rem; }
+
+  .tabs { display: flex; gap: 0; margin-bottom: 1rem; border-bottom: 2px solid #e5e7eb; }
+  .tabs .tab {
+    padding: .5rem 1rem; cursor: pointer; font-size: .85rem;
+    border-bottom: 2px solid transparent; margin-bottom: -2px; color: #6b7280;
+  }
+  .tabs .tab:hover { color: #1a1a2e; }
+  .tabs .tab.active { color: #1a1a2e; border-bottom-color: #3b82f6; font-weight: 600; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
   .filters {
-    background: #fff; border-radius: 10px; padding: 1rem 1.5rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 1.5rem;
-    display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+    background: #fff; border-radius: 10px; padding: .8rem 1.2rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08); margin-bottom: 1rem;
+    display: flex; gap: .8rem; align-items: center; flex-wrap: wrap;
   }
   .filters input, .filters select {
-    padding: .5rem .75rem; border: 1px solid #d1d5db; border-radius: 6px;
-    font-size: .9rem; outline: none;
+    padding: .4rem .6rem; border: 1px solid #d1d5db; border-radius: 6px;
+    font-size: .85rem; outline: none;
   }
   .filters input:focus, .filters select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
-  .filters input { flex: 1; min-width: 200px; }
-  .grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 1rem;
-  }
+  .filters input { flex: 1; min-width: 180px; }
+  .filters select { min-width: 180px; }
+  .filters .resolve-progress { flex: 1; min-width: 180px; }
+  .progress-bar { height: 5px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
+  .progress-bar .fill { height: 100%; width: 0; background: linear-gradient(90deg, #3b82f6, #8b5cf6); transition: width .3s; }
+  .progress-text { font-size: .75rem; color: #6b7280; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: .8rem; }
   .card {
-    background: #fff; border-radius: 10px; padding: 1.25rem;
+    background: #fff; border-radius: 10px; padding: 1rem;
     box-shadow: 0 1px 4px rgba(0,0,0,.08); transition: box-shadow .15s;
-    position: relative;
   }
   .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.12); }
-  .card .title {
-    font-size: 1rem; font-weight: 600; margin-bottom: .4rem;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .card .meta {
-    font-size: .82rem; color: #6b7280; margin-bottom: .6rem;
-  }
+  .card .title { font-size: .95rem; font-weight: 600; margin-bottom: .3rem; cursor: pointer; }
+  .card .title:hover { color: #3b82f6; }
+  .card .meta { font-size: .8rem; color: #6b7280; margin-bottom: .3rem; }
   .card .meta .author { color: #3b82f6; }
-  .card .meta .year { background: #e5e7eb; padding: .1rem .4rem; border-radius: 4px; font-size: .75rem; }
-  .card .filename {
-    font-size: .75rem; color: #9ca3af; margin-bottom: .75rem;
-    font-family: monospace; word-break: break-all;
+  .card .meta .year { background: #e5e7eb; padding: .1rem .4rem; border-radius: 4px; font-size: .72rem; }
+  .badge {
+    display: inline-block; font-size: .68rem; padding: .1rem .35rem;
+    border-radius: 4px; font-family: monospace; cursor: pointer;
   }
-  .tags {
-    display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: .75rem;
+  .badge-doi { background: #fef3c7; color: #92400e; }
+  .badge-doi:hover { background: #fde68a; }
+  .badge-arxiv { background: #dbeafe; color: #1e40af; }
+  .badge-arxiv:hover { background: #bfdbfe; }
+  .badge-type { background: #f3e8ff; color: #7c3aed; cursor: default; }
+  .badge-type:hover { background: #ede9fe; }
+  .card .abstract {
+    font-size: .75rem; color: #6b7280; margin: .3rem 0 .5rem;
+    max-height: 0; overflow: hidden; transition: max-height .3s; line-height: 1.4;
   }
+  .card .abstract.open { max-height: 300px; overflow-y: auto; }
+  .card .filename { font-size: .72rem; color: #9ca3af; margin-bottom: .4rem; font-family: monospace; word-break: break-all; }
+  .tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-bottom: .4rem; }
   .tag {
-    background: #e0e7ff; color: #4338ca; font-size: .75rem;
-    padding: .15rem .6rem; border-radius: 999px; cursor: pointer;
-    display: inline-flex; align-items: center; gap: .25rem;
+    background: #e0e7ff; color: #4338ca; font-size: .72rem;
+    padding: .1rem .5rem; border-radius: 999px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: .2rem;
   }
   .tag .remove { cursor: pointer; font-weight: bold; opacity: .6; }
   .tag .remove:hover { opacity: 1; }
   .tag-add {
     background: transparent; border: 1px dashed #93c5fd; color: #3b82f6;
-    font-size: .75rem; padding: .15rem .6rem; border-radius: 999px;
-    cursor: pointer;
+    font-size: .72rem; padding: .1rem .5rem; border-radius: 999px; cursor: pointer;
   }
   .tag-add:hover { background: #eff6ff; }
-  .card-actions {
-    display: flex; gap: .5rem; margin-top: .75rem; padding-top: .75rem;
-    border-top: 1px solid #f3f4f6;
-  }
-  .card-actions button {
-    padding: .35rem .75rem; border-radius: 6px; font-size: .8rem;
-    border: none; cursor: pointer;
-  }
+  .card-actions { display: flex; gap: .4rem; margin-top: .4rem; padding-top: .4rem; border-top: 1px solid #f3f4f6; }
+  .card-actions button { padding: .3rem .6rem; border-radius: 6px; font-size: .75rem; border: none; cursor: pointer; }
   .btn-open { background: #1a1a2e; color: #fff; }
   .btn-open:hover { background: #16213e; }
   .btn-edit { background: #f3f4f6; color: #374151; }
   .btn-edit:hover { background: #e5e7eb; }
+  .btn-resolve { background: #fef3c7; color: #92400e; }
+  .btn-resolve:hover { background: #fde68a; }
+  .btn-resolve:disabled { opacity: .5; cursor: wait; }
+  .btn-retag { background: #ccfbf1; color: #0f766e; }
+  .btn-retag:hover { background: #99f6e4; }
   .btn-delete { background: #fef2f2; color: #dc2626; }
   .btn-delete:hover { background: #fee2e2; }
-  .empty {
-    text-align: center; padding: 3rem; color: #9ca3af; grid-column: 1 / -1;
-  }
-  .modal-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4);
-    justify-content: center; align-items: center; z-index: 100;
-  }
+  .empty { text-align: center; padding: 2rem; color: #9ca3af; grid-column: 1 / -1; }
+
+  #graph { width: 100%; height: 600px; background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); justify-content: center; align-items: center; z-index: 100; }
   .modal-overlay.active { display: flex; }
-  .modal {
-    background: #fff; border-radius: 12px; padding: 1.5rem 2rem;
-    width: 90%; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,.2);
-  }
+  .modal { background: #fff; border-radius: 12px; padding: 1.5rem 2rem; width: 90%; max-width: 420px; box-shadow: 0 8px 32px rgba(0,0,0,.2); }
   .modal h2 { font-size: 1.1rem; margin-bottom: 1rem; }
   .modal label { display: block; font-size: .85rem; color: #374151; margin-bottom: .25rem; }
-  .modal input { width: 100%; padding: .5rem .75rem; border: 1px solid #d1d5db;
-    border-radius: 6px; font-size: .9rem; margin-bottom: .75rem; outline: none; }
+  .modal input { width: 100%; padding: .5rem .75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: .9rem; margin-bottom: .75rem; outline: none; }
   .modal input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.15); }
   .modal .buttons { display: flex; gap: .5rem; justify-content: flex-end; margin-top: .5rem; }
   .modal .buttons button { padding: .5rem 1rem; border-radius: 6px; border: none; cursor: pointer; }
   .modal .btn-save { background: #1a1a2e; color: #fff; }
   .modal .btn-cancel { background: #f3f4f6; color: #374151; }
-  .tag-input-row { display: flex; gap: .35rem; }
-  .tag-input-row input { flex: 1; margin-bottom: 0; }
-  .tag-input-row button { background: #e0e7ff; border: none; color: #4338ca;
-    padding: .35rem .6rem; border-radius: 6px; cursor: pointer; font-size: .8rem; }
-  .toast {
-    position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1a1a2e;
-    color: #fff; padding: .75rem 1.25rem; border-radius: 8px;
-    font-size: .85rem; opacity: 0; transition: opacity .3s; z-index: 200;
-    pointer-events: none;
-  }
+
+  .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1a1a2e; color: #fff; padding: .75rem 1.25rem; border-radius: 8px; font-size: .85rem; opacity: 0; transition: opacity .3s; z-index: 200; pointer-events: none; }
   .toast.show { opacity: 1; }
-  @media (max-width: 640px) {
-    .container { padding: 1rem; }
-    .grid { grid-template-columns: 1fr; }
-  }
+  .global-progress { position: fixed; bottom: 4rem; right: 1.5rem; background: #1e293b; color: #e2e8f0; padding: .6rem 1rem; border-radius: 10px; font-size: .8rem; box-shadow: 0 4px 16px rgba(0,0,0,.25); z-index: 199; display: none; min-width: 220px; }
+  .global-progress .gp-text { margin-bottom: .3rem; white-space: nowrap; }
+  .global-progress .progress-bar { height: 4px; }
+  .spinner { display: inline-block; width: .8rem; height: .8rem; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (max-width: 640px) { .container { padding: .8rem; } .grid { grid-template-columns: 1fr; } #graph { height: 350px; } }
 </style>
 </head>
 <body>
 <div class="header">
-  <h1>📄 HomeArxiv</h1>
-  <span class="subtitle">Gestor local de papers y documentos</span>
-  <button onclick="scanPapers()">🔄 Escanear carpeta</button>
+  <h1 onclick="switchTab('papers')">📄 HomeArxiv</h1>
+  <span class="subtitle" data-i18n="subtitle">Gestor local de papers</span>
+  <div class="spacer">
+    <button onclick="resolveAll()" id="resolveAllBtn" style="background:#d97706;" data-i18n="resolveAll">⚡ Resolver todos</button>
+    <button onclick="scanPapers()" id="scanBtn" data-i18n="scan">🔄 Leer</button>
+    <button onclick="cleanDuplicates()" id="dedupBtn" style="background:#6b21a8;" data-i18n="dedup">🧹 Duplicados</button>
+    <button onclick="retagAll()" id="retagBtn" style="background:#0891b2;" data-i18n="retag">🏷️ Recalcular etiquetas</button>
+    <select id="langSelect" onchange="setLang(this.value)">
+      <option value="es">🇪🇸 Español</option>
+      <option value="en">🇬🇧 English</option>
+      <option value="ca">🏳️ Català</option>
+      <option value="eu">🏳️ Euskara</option>
+      <option value="gl">🏳️ Galego</option>
+    </select>
+  </div>
 </div>
 
 <div class="container">
-  <div class="filters">
-    <input type="text" id="searchInput" placeholder="Buscar por título, autor o archivo..." oninput="render()">
-    <select id="tagFilter" onchange="render()">
-      <option value="">Todas las etiquetas</option>
-    </select>
+  <div class="tabs">
+    <div class="tab active" data-tab="papers" onclick="switchTab('papers')">📄 <span data-i18n="tabPapers">Papers</span></div>
+    <div class="tab" data-tab="graph" onclick="switchTab('graph')">🔗 <span data-i18n="tabGraph">Grafo</span></div>
   </div>
 
-  <div class="grid" id="docGrid"></div>
+  <div class="tab-content active" id="tab-papers">
+    <div class="filters">
+      <input type="text" id="searchInput" data-i18n-placeholder="searchPlaceholder" placeholder="Buscar..." oninput="render()">
+      <select id="tagFilter" onchange="render()"><option value="" data-i18n="allTags">Todas las etiquetas</option></select>
+      <select id="typeFilter" onchange="render()"><option value="" data-i18n="allTypes">Todos los tipos</option>
+        <option value="paper" data-i18n="typePaper">Artículo</option>
+        <option value="book" data-i18n="typeBook">Libro</option>
+        <option value="presentation" data-i18n="typePresentation">Presentación</option>
+        <option value="poster" data-i18n="typePoster">Póster</option>
+      </select>
+      <div class="resolve-progress" id="resolveProgress" style="display:none">
+        <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+        <div class="progress-text" id="progressText"></div>
+      </div>
+    </div>
+    <div class="grid" id="docGrid"></div>
+  </div>
+
+  <div class="tab-content" id="tab-graph">
+    <div class="filters">
+      <span style="font-size:.82rem;color:#6b7280" data-i18n="graphHint">Nodos = papers · Aristas = etiquetas compartidas</span>
+      <div class="resolve-progress" id="graphProgress" style="display:none">
+        <div class="progress-bar"><div class="fill" id="graphProgressFill"></div></div>
+        <div class="progress-text" id="graphProgressText" data-i18n="graphLoading">Cargando grafo...</div>
+      </div>
+    </div>
+    <div id="graph"><div style="text-align:center;padding:3rem;color:#9ca3af" data-i18n="graphGo">Ve a la pestaña Papers para empezar</div></div>
+  </div>
 </div>
 
-<!-- Edit Modal -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
-    <h2>Editar documento</h2>
+    <h2 data-i18n="editTitle">Editar documento</h2>
     <input type="hidden" id="editId">
-    <label>Título</label>
+    <label data-i18n="editTitleLabel">Título</label>
     <input type="text" id="editTitle">
-    <label>Autor</label>
+    <label data-i18n="editAuthorLabel">Autor</label>
     <input type="text" id="editAuthor">
-    <label>Año</label>
+    <label data-i18n="editYearLabel">Año</label>
     <input type="number" id="editYear">
+    <label data-i18n="editDoiLabel">DOI / arXiv ID</label>
+    <input type="text" id="editDoi" placeholder="10.xxxx/xxxxx  ó  YYMM.NNNNN">
+    <label data-i18n="editTypeLabel">Tipo</label>
+    <select id="editType" style="width:100%;padding:.5rem .75rem;border:1px solid #d1d5db;border-radius:6px;font-size:.9rem;margin-bottom:.75rem;outline:none;">
+      <option value="paper" data-i18n="typePaper">Artículo</option>
+      <option value="book" data-i18n="typeBook">Libro</option>
+      <option value="presentation" data-i18n="typePresentation">Presentación</option>
+      <option value="poster" data-i18n="typePoster">Póster</option>
+    </select>
     <div class="buttons">
-      <button class="btn-cancel" onclick="closeEditModal()">Cancelar</button>
-      <button class="btn-save" onclick="saveEdit()">Guardar</button>
+      <button class="btn-cancel" onclick="closeEditModal()" data-i18n="cancel">Cancelar</button>
+      <button class="btn-save" onclick="saveEdit()" data-i18n="save">Guardar</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
+<div class="global-progress" id="globalProgress">
+  <div class="gp-text" id="gpText"></div>
+  <div class="progress-bar"><div class="fill" id="gpFill"></div></div>
+</div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.9/dist/vis-network.min.js"></script>
 <script>
+// ── Translations ───────────────────────────────────────────────────────────
+
+const LANGS = {
+  es: {
+    subtitle: "Gestor local de papers", scan: "🔄 Leer", resolveAll: "⚡ Resolver todos",
+    dedup: "🧹 Duplicados", tabPapers: "Papers", tabGraph: "Grafo",
+    searchPlaceholder: "Buscar por título, autor, DOI, abstract...",
+    allTags: "Todas las etiquetas", graphHint: "Nodos = papers · Aristas = etiquetas compartidas",
+    graphLoading: "Cargando grafo...", graphGo: "Ve a la pestaña Papers para empezar",
+    editTitle: "Editar documento", editTitleLabel: "Título", editAuthorLabel: "Autor",
+    editYearLabel: "Año", editDoiLabel: "DOI / arXiv ID", cancel: "Cancelar", save: "Guardar",
+    noDocs: "📂 No se encontraron documentos. Añade PDFs a la carpeta <strong>papers/</strong> y lee.",
+    deleteConfirm: "¿Eliminar este documento de la base de datos?", deleted: "Documento eliminado",
+    resolved: "Resuelto", resolving: "Resolviendo...", completed: "Completado",
+    scanned: "Leídos", scanning: "Leyendo...", graphReady: "Grafo listo",
+    graphFetch: "Descargando datos del grafo...", graphNodes: "Procesando nodos...",
+    graphEdges: "Procesando aristas...", graphRender: "Renderizando grafo...",
+    graphEmpty: "No hay datos para mostrar", dupRemoved: "Eliminados", noDups: "No hay duplicados",
+    added: "nuevo(s)", alreadyRunning: "Ya está en ejecución", error: "Error",
+    typePaper: "Artículo", typeBook: "Libro", typePresentation: "Presentación", typePoster: "Póster",
+    allTypes: "Todos los tipos", editTypeLabel: "Tipo",
+    retag: "🏷️ Recalcular etiquetas", retagDone: "Etiquetas recalculadas",
+    resolve: "🔍 Resolver",
+  },
+  en: {
+    subtitle: "Local paper manager", scan: "🔄 Read", resolveAll: "⚡ Resolve all",
+    dedup: "🧹 Dedup", tabPapers: "Papers", tabGraph: "Graph",
+    searchPlaceholder: "Search by title, author, DOI, abstract...",
+    allTags: "All tags", graphHint: "Nodes = papers · Edges = shared tags",
+    graphLoading: "Loading graph...", graphGo: "Go to Papers tab to start",
+    editTitle: "Edit document", editTitleLabel: "Title", editAuthorLabel: "Author",
+    editYearLabel: "Year", editDoiLabel: "DOI / arXiv ID", cancel: "Cancel", save: "Save",
+    noDocs: "📂 No documents found. Add PDFs to <strong>papers/</strong> and read.",
+    deleteConfirm: "Delete this document from the database?", deleted: "Document deleted",
+    resolved: "Resolved", resolving: "Resolving...", completed: "Completed",
+    scanned: "Read", scanning: "Reading...", graphReady: "Graph ready",
+    graphFetch: "Fetching graph data...", graphNodes: "Processing nodes...",
+    graphEdges: "Processing edges...", graphRender: "Rendering graph...",
+    graphEmpty: "No data to display", dupRemoved: "Removed", noDups: "No duplicates found",
+    added: "new", alreadyRunning: "Already running", error: "Error",
+    typePaper: "Paper", typeBook: "Book", typePresentation: "Presentation", typePoster: "Poster",
+    allTypes: "All types", editTypeLabel: "Type",
+    retag: "🏷️ Recalculate tags", retagDone: "Tags recalculated",
+    resolve: "🔍 Resolve",
+  },
+  ca: {
+    subtitle: "Gestor local de papers", scan: "🔄 Llegir", resolveAll: "⚡ Resoldre tots",
+    dedup: "🧹 Duplicats", tabPapers: "Papers", tabGraph: "Graf",
+    searchPlaceholder: "Cerca per títol, autor, DOI, abstract...",
+    allTags: "Totes les etiquetes", graphHint: "Nodes = papers · Arestes = etiquetes compartides",
+    graphLoading: "Carregant graf...", graphGo: "Ves a la pestanya Papers per començar",
+    editTitle: "Editar document", editTitleLabel: "Títol", editAuthorLabel: "Autor",
+    editYearLabel: "Any", editDoiLabel: "DOI / arXiv ID", cancel: "Cancel·lar", save: "Guardar",
+    noDocs: "📂 No s'han trobat documents. Afegeix PDFs a <strong>papers/</strong> i llegeix.",
+    deleteConfirm: "Eliminar aquest document de la base de dades?", deleted: "Document eliminat",
+    resolved: "Resolt", resolving: "Resolent...", completed: "Completat",
+    scanned: "Llegits", scanning: "Llegint...", graphReady: "Graf llest",
+    graphFetch: "Descarregant dades del graf...", graphNodes: "Processant nodes...",
+    graphEdges: "Processant arestes...", graphRender: "Renderitzant graf...",
+    graphEmpty: "No hi ha dades", dupRemoved: "Eliminats", noDups: "No hi ha duplicats",
+    added: "nou(s)", alreadyRunning: "Ja està en execució", error: "Error",
+    typePaper: "Article", typeBook: "Llibre", typePresentation: "Presentació", typePoster: "Pòster",
+    allTypes: "Tots els tipus", editTypeLabel: "Tipus",
+    retag: "🏷️ Recalcular etiquetes", retagDone: "Etiquetes recalculades",
+    resolve: "🔍 Resoldre",
+  },
+  eu: {
+    subtitle: "Paper-en kudeatzaile lokala", scan: "🔄 Irakurri", resolveAll: "⚡ Ebatzi guztiak",
+    dedup: "🧹 Bikoiztuak", tabPapers: "Paperrak", tabGraph: "Grafoa",
+    searchPlaceholder: "Bilatu izenburu, egile, DOI, abstract...",
+    allTags: "Etiketa guztiak", graphHint: "Nodoak = paperrak · Edges = partekatutako etiketak",
+    graphLoading: "Grafoa kargatzen...", graphGo: "Joan Papers fitxara hasteko",
+    editTitle: "Dokumentua editatu", editTitleLabel: "Izenburua", editAuthorLabel: "Egilea",
+    editYearLabel: "Urtea", editDoiLabel: "DOI / arXiv ID", cancel: "Ezeztatu", save: "Gorde",
+    noDocs: "📂 Ez da dokumenturik aurkitu. Gehitu PDFak <strong>papers/</strong> karpetan eta irakurri.",
+    deleteConfirm: "Dokumentu hau ezabatu datu-basetik?", deleted: "Dokumentua ezabatuta",
+    resolved: "Ebatzita", resolving: "Ebazten...", completed: "Osatuta",
+    scanned: "Irakurrita", scanning: "Irakurtzen...", graphReady: "Grafoa prest",
+    graphFetch: "Grafoaren datuak deskargatzen...", graphNodes: "Nodoak prozesatzen...",
+    graphEdges: "Erdgeak prozesatzen...", graphRender: "Grafoa errendatzen...",
+    graphEmpty: "Ez dago daturik erakusteko", dupRemoved: "Ezabatuta", noDups: "Ez dago bikoiztutako",
+    added: "berri", alreadyRunning: "Dagoeneko martxan", error: "Errorea",
+    typePaper: "Artikulua", typeBook: "Liburua", typePresentation: "Aurkezpena", typePoster: "Posterra",
+    allTypes: "Mota guztiak", editTypeLabel: "Mota",
+    retag: "🏷️ Berriz etiketatu", retagDone: "Etiketak berriz kalkulatu",
+    resolve: "🔍 Ebatzi",
+  },
+  gl: {
+    subtitle: "Xestor local de papers", scan: "🔄 Ler", resolveAll: "⚡ Resolver todos",
+    dedup: "🧹 Duplicados", tabPapers: "Papers", tabGraph: "Grafo",
+    searchPlaceholder: "Buscar por título, autor, DOI, abstract...",
+    allTags: "Todas as etiquetas", graphHint: "Nodos = papers · Arestas = etiquetas compartidas",
+    graphLoading: "Cargando grafo...", graphGo: "Vai á pestana Papers para comenzar",
+    editTitle: "Editar documento", editTitleLabel: "Título", editAuthorLabel: "Autor",
+    editYearLabel: "Ano", editDoiLabel: "DOI / arXiv ID", cancel: "Cancelar", save: "Gardar",
+    noDocs: "📂 Non se atoparon documentos. Engade PDFs a <strong>papers/</strong> e le.",
+    deleteConfirm: "Eliminar este documento da base de datos?", deleted: "Documento eliminado",
+    resolved: "Resolto", resolving: "Resolvendo...", completed: "Completado",
+    scanned: "Lidos", scanning: "Lendo...", graphReady: "Grafo listo",
+    graphFetch: "Descargando datos do grafo...", graphNodes: "Procesando nodos...",
+    graphEdges: "Procesando arestas...", graphRender: "Renderizando grafo...",
+    graphEmpty: "Non hai datos para amosar", dupRemoved: "Eliminados", noDups: "Non hai duplicados",
+    added: "novo(s)", alreadyRunning: "Xa está en execución", error: "Erro",
+    typePaper: "Artigo", typeBook: "Libro", typePresentation: "Presentación", typePoster: "Póster",
+    allTypes: "Todos os tipos", editTypeLabel: "Tipo",
+    retag: "🏷️ Recalcular etiquetas", retagDone: "Etiquetas recalculadas",
+    resolve: "🔍 Resolver",
+  }
+};
+
+let lang = "es";
+
+function t(key) {
+  return (LANGS[lang] && LANGS[lang][key]) || LANGS["es"][key] || key;
+}
+
+function setLang(code) {
+  lang = code;
+  localStorage.setItem("homearxiv_lang", code);
+  document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = t(el.dataset.i18n));
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => el.placeholder = t(el.dataset.i18nPlaceholder));
+  if (document.getElementById("editModal").classList.contains("active")) {
+    document.querySelector("#editModal h2").textContent = t("editTitle");
+  }
+}
+
+// ── Globals ─────────────────────────────────────────────────────────────────
+
 let documents = [];
 let allTags = [];
+let progressInterval = null;
+let graphInitialized = false;
+let network = null;
 
-async function fetchJSON(url, opts) {
-  const r = await fetch(url, opts);
-  return r.json();
+async function fetchJSON(url, opts, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs || 30000);
+  try {
+    const r = await fetch(url, { ...opts, signal: controller.signal });
+    if (!r.ok) {
+      const text = await r.text();
+      throw new Error(r.status + ": " + text.slice(0, 200));
+    }
+    return r.json();
+  } finally {
+    clearTimeout(timer);
+  }
 }
+
+// ── Tabs ────────────────────────────────────────────────────────────────────
+
+function switchTab(name) {
+  document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(el => el.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+  document.querySelector(`.tab[data-tab="${name}"]`).classList.add("active");
+  if (name === "graph") renderGraph();
+}
+
+// ── Scan / Dedup ────────────────────────────────────────────────────────────
 
 async function scanPapers() {
-  const data = await fetchJSON("/api/scan", { method: "POST" });
-  toast(`Escaneados: ${data.added} nuevo(s)`);
-  await loadTags();
-  await render();
+  const btn = document.getElementById("scanBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  showProgress(t("scanning"));
+  try {
+    const data = await fetchJSON("/api/scan", { method: "POST" }, 120000);
+    hideProgress(); toast(`${t("scanned")}: ${data.added} ${t("added")}`);
+  } catch (e) {
+    hideProgress(); toast(t("error")+": "+e.message);
+  }
+  await loadTags(); await render();
+  btn.disabled = false; btn.innerHTML = t("scan");
 }
+
+async function retagAll() {
+  const btn = document.getElementById("retagBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  showProgress(t("retagDone"));
+  try {
+    await fetchJSON("/api/retag", { method: "POST" }, 180000);
+    hideProgress(); toast(t("retagDone"));
+  } catch (e) {
+    hideProgress(); toast(t("error")+": "+e.message);
+  }
+  await loadTags(); await render();
+  btn.disabled = false; btn.innerHTML = t("retag");
+}
+
+async function cleanDuplicates() {
+  const btn = document.getElementById("dedupBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  showProgress(t("dedup"));
+  try {
+    const data = await fetchJSON("/api/dedup", { method: "POST" }, 30000);
+    hideProgress(); toast(data.removed > 0 ? `${t("dupRemoved")} ${data.removed}` : t("noDups"));
+  } catch (e) {
+    hideProgress(); toast(t("error")+": "+e.message);
+  }
+  await loadTags(); await render();
+  btn.disabled = false; btn.innerHTML = t("dedup");
+}
+
+// ── Batch resolve ───────────────────────────────────────────────────────────
+
+async function resolveAll() {
+  const btn = document.getElementById("resolveAllBtn");
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    const data = await fetchJSON("/api/resolve-all", { method: "POST" }, 30000);
+    if (data.error) { toast(t("error") + ": " + data.error); btn.disabled = false; btn.innerHTML = t("resolveAll"); return; }
+    document.getElementById("resolveProgress").style.display = "block";
+    progressInterval = setInterval(pollProgress, 600);
+  } catch (e) {
+    toast(t("error")+": "+e.message);
+    btn.disabled = false; btn.innerHTML = t("resolveAll");
+  }
+}
+
+async function pollProgress() {
+  try {
+    const state = await fetchJSON("/api/resolve-progress", {}, 10000);
+    const pct = state.total > 0 ? Math.round(state.current / state.total * 100) : 0;
+    document.getElementById("progressFill").style.width = pct + "%";
+    document.getElementById("progressText").textContent = state.running
+      ? `${t("resolving")} ${state.current}/${state.total}... ${state.current_label || ""}`
+      : state.total > 0 ? `${t("completed")} (${state.total})` : "";
+    if (!state.running) {
+      clearInterval(progressInterval); progressInterval = null;
+      setTimeout(() => {
+        document.getElementById("resolveProgress").style.display = "none";
+        document.getElementById("resolveAllBtn").disabled = false;
+        document.getElementById("resolveAllBtn").innerHTML = t("resolveAll");
+      }, 2000);
+      await loadTags(); await render();
+    }
+  } catch (e) {
+    // keep polling on error
+  }
+}
+
+// ── Tags ────────────────────────────────────────────────────────────────────
 
 async function loadTags() {
   allTags = await fetchJSON("/api/tags");
   const sel = document.getElementById("tagFilter");
   const cur = sel.value;
-  sel.innerHTML = '<option value="">Todas las etiquetas</option>';
+  sel.innerHTML = '<option value="">' + t("allTags") + '</option>';
   for (const t of allTags) {
     const opt = document.createElement("option");
     opt.value = t; opt.textContent = t;
@@ -193,40 +483,83 @@ async function loadTags() {
   }
 }
 
+function looksLikeDoi(text) { return /^10\.\d{4,}\/.+$/.test(text.trim()); }
+function looksLikeIsbn(text) { return /^(978|979)?\d{9}[\dXx]$/.test(text.trim().replace(/-/g,"").replace(/\s/g,"")); }
+function looksLikeArxiv(text) {
+  let t = text.trim().replace(/\.pdf$/i,"").replace(/^arxiv:/i,"");
+  t = t.replace(/v\d+$/i,"").replace(/\./g,"");
+  return /^\d{8,}$/.test(t) && !looksLikeIsbn(t);
+}
+function needsResolve(doc) {
+  const t = (doc.title||"").trim().replace(/\.pdf$/i,"");
+  const f = doc.filename.replace(".pdf","");
+  return looksLikeDoi(t)||looksLikeArxiv(t)||looksLikeIsbn(t)||looksLikeDoi(f)||looksLikeArxiv(f)||looksLikeIsbn(f);
+}
+function detectBadge(doc) {
+  const t = (doc.title||"").trim().replace(/\.pdf$/i,"");
+  if (doc.doi) {
+    if (looksLikeDoi(doc.doi)) return {label:"DOI: "+doc.doi, cls:"badge-doi"};
+    if (looksLikeIsbn(doc.doi)) return {label:"ISBN: "+doc.doi, cls:"badge-arxiv"};
+    return {label:"arXiv: "+doc.doi, cls:"badge-arxiv"};
+  }
+  if (looksLikeDoi(t)) return {label:"DOI detectado", cls:"badge-doi"};
+  if (looksLikeIsbn(t)) return {label:"ISBN detectado", cls:"badge-arxiv"};
+  if (looksLikeArxiv(t)) return {label:"arXiv detectado", cls:"badge-arxiv"};
+  return null;
+}
+
+// ── Render ──────────────────────────────────────────────────────────────────
+
 async function render() {
   const search = document.getElementById("searchInput").value;
   const tag = document.getElementById("tagFilter").value;
+  const type = document.getElementById("typeFilter").value;
   const params = new URLSearchParams();
   if (search) params.set("search", search);
   if (tag) params.set("tag", tag);
+  if (type) params.set("type", type);
   documents = await fetchJSON(`/api/documents?${params}`);
   const grid = document.getElementById("docGrid");
   grid.innerHTML = "";
   if (documents.length === 0) {
-    grid.innerHTML = '<div class="empty">📂 No se encontraron documentos. Añade PDFs a la carpeta <strong>papers/</strong> y escanea.</div>';
+    grid.innerHTML = '<div class="empty">' + t("noDocs") + '</div>';
     return;
   }
   for (const doc of documents) {
     const card = document.createElement("div");
     card.className = "card";
+    const badge = detectBadge(doc);
+    const showResolve = needsResolve(doc);
+    const abs = doc.abstract || "";
+    const typeLabel = doc.doc_type && doc.doc_type !== "paper" ? t("type" + doc.doc_type.charAt(0).toUpperCase() + doc.doc_type.slice(1)) : "";
     card.innerHTML = `
-      <div class="title">${esc(doc.title || doc.filename)}</div>
+      <div class="title" onclick="toggleAbstract(${doc.id})">${esc(doc.title || doc.filename)}</div>
       <div class="meta">
         ${doc.author ? `<span class="author">${esc(doc.author)}</span>` : ""}
         ${doc.author && doc.year ? " · " : ""}
         ${doc.year ? `<span class="year">${doc.year}</span>` : ""}
+        ${typeLabel ? ` <span class="badge badge-type">${esc(typeLabel)}</span>` : ""}
+        ${badge ? ` <span class="badge ${badge.cls}" onclick="resolveDoc(${doc.id})">${esc(badge.label)}</span>` : ""}
       </div>
+      ${abs ? `<div class="abstract" id="abs-${doc.id}">${esc(abs)}</div>` : ""}
       <div class="filename">${esc(doc.filename)}</div>
       <div class="tags" id="tags-${doc.id}"></div>
       <div class="card-actions">
-        <button class="btn-open" onclick="openPdf(${doc.id})">📖 Abrir</button>
-        <button class="btn-edit" onclick="editDoc(${doc.id})">✏️ Editar</button>
+        <button class="btn-open" onclick="openPdf(${doc.id})">📖 ${t("scan").replace("🔄 ","")}</button>
+        ${showResolve ? `<button class="btn-resolve" id="resBtn-${doc.id}" onclick="resolveDoc(${doc.id})">${t("resolve")}</button>` : ""}
+        <button class="btn-retag" onclick="retagDoc(${doc.id})">🏷️</button>
+        <button class="btn-edit" onclick="editDoc(${doc.id})">✏️</button>
         <button class="btn-delete" onclick="deleteDoc(${doc.id})">🗑️</button>
       </div>
     `;
     grid.appendChild(card);
     renderTags(doc);
   }
+}
+
+function toggleAbstract(id) {
+  const el = document.getElementById("abs-" + id);
+  if (el) el.classList.toggle("open");
 }
 
 function renderTags(doc) {
@@ -239,10 +572,9 @@ function renderTags(doc) {
     span.innerHTML = `${esc(t)} <span class="remove" onclick="removeTag(${doc.id},'${esc(t)}')">×</span>`;
     container.appendChild(span);
   }
-  // Add tag input
   const addSpan = document.createElement("span");
   addSpan.className = "tag-add";
-  addSpan.textContent = "+ etiqueta";
+  addSpan.textContent = "+";
   addSpan.onclick = () => showAddTagInput(doc.id, addSpan);
   container.appendChild(addSpan);
 }
@@ -250,48 +582,52 @@ function renderTags(doc) {
 function showAddTagInput(docId, el) {
   const input = document.createElement("input");
   input.type = "text";
-  input.placeholder = "nueva etiqueta";
-  input.style.cssText = "width:100px;font-size:.75rem;padding:.1rem .4rem;border:1px solid #93c5fd;border-radius:999px;outline:none;";
+  input.placeholder = "";
+  input.style.cssText = "width:90px;font-size:.72rem;padding:.1rem .4rem;border:1px solid #93c5fd;border-radius:999px;outline:none;";
   el.replaceWith(input);
   input.focus();
   input.onkeydown = async (e) => {
-    if (e.key === "Enter" && input.value.trim()) {
-      await addTag(docId, input.value.trim());
-      await render();
-    } else if (e.key === "Escape") {
-      await render();
-    }
+    if (e.key === "Enter" && input.value.trim()) { await addTag(docId, input.value.trim()); await render(); }
+    else if (e.key === "Escape") { await render(); }
   };
-  input.onblur = async () => {
-    if (input.value.trim()) {
-      await addTag(docId, input.value.trim());
-    }
-    await render();
-  };
+  input.onblur = async () => { if (input.value.trim()) { await addTag(docId, input.value.trim()); } await render(); };
 }
 
-async function openPdf(id) {
-  await fetchJSON(`/api/open/${id}`);
-}
-
+async function openPdf(id) { await fetchJSON(`/api/open/${id}`); }
 async function deleteDoc(id) {
-  if (!confirm("¿Eliminar este documento de la base de datos?")) return;
+  if (!confirm(t("deleteConfirm"))) return;
   await fetchJSON(`/api/documents/${id}`, { method: "DELETE" });
-  toast("Documento eliminado");
-  await render();
+  toast(t("deleted")); await render();
 }
-
 async function addTag(docId, name) {
-  await fetchJSON(`/api/documents/${docId}/tags`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ tag: name }),
-  });
+  await fetchJSON(`/api/documents/${docId}/tags`, { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({tag: name}) });
 }
-
 async function removeTag(docId, name) {
   await fetchJSON(`/api/documents/${docId}/tags/${encodeURIComponent(name)}`, { method: "DELETE" });
   await render();
+}
+async function resolveDoc(id) {
+  const btn = document.getElementById("resBtn-" + id);
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
+  showProgress(t("resolving"));
+  try {
+    const result = await fetchJSON(`/api/documents/${id}/resolve`, { method: "POST" }, 60000);
+    hideProgress(); toast(result.error ? t("error")+": "+result.error : t("resolved")+" ("+result.source+")");
+  } catch (e) {
+    hideProgress(); toast(t("error")+": "+e.message);
+  }
+  await render();
+}
+
+async function retagDoc(id) {
+  showProgress(t("retagDone"));
+  try {
+    await fetchJSON(`/api/documents/${id}/retag`, { method: "POST" }, 120000);
+    hideProgress(); toast(t("retagDone"));
+  } catch (e) {
+    hideProgress(); toast(t("error")+": "+e.message);
+  }
+  await loadTags(); await render();
 }
 
 function editDoc(id) {
@@ -301,53 +637,146 @@ function editDoc(id) {
   document.getElementById("editTitle").value = doc.title || "";
   document.getElementById("editAuthor").value = doc.author || "";
   document.getElementById("editYear").value = doc.year || "";
+  document.getElementById("editDoi").value = doc.doi || "";
+  document.getElementById("editType").value = doc.doc_type || "paper";
   document.getElementById("editModal").classList.add("active");
+  document.querySelector("#editModal h2").textContent = t("editTitle");
 }
-
 async function saveEdit() {
   const id = document.getElementById("editId").value;
-  const data = {
+  await fetchJSON(`/api/documents/${id}`, { method: "PUT", headers: {"Content-Type":"application/json"}, body: JSON.stringify({
     title: document.getElementById("editTitle").value.trim(),
     author: document.getElementById("editAuthor").value.trim(),
     year: document.getElementById("editYear").value ? parseInt(document.getElementById("editYear").value) : null,
-  };
-  await fetchJSON(`/api/documents/${id}`, {
-    method: "PUT",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(data),
-  });
-  closeEditModal();
-  toast("Documento actualizado");
-  await render();
+    doi: document.getElementById("editDoi").value.trim() || null,
+    doc_type: document.getElementById("editType").value,
+  })});
+  closeEditModal(); toast(t("save")); await render();
 }
+function closeEditModal() { document.getElementById("editModal").classList.remove("active"); }
+document.getElementById("editModal").onclick = (e) => { if (e.target === e.currentTarget) closeEditModal(); };
 
-function closeEditModal() {
-  document.getElementById("editModal").classList.remove("active");
-}
-
-// Close modal on overlay click
-document.getElementById("editModal").onclick = (e) => {
-  if (e.target === e.currentTarget) closeEditModal();
-};
-
-function esc(s) {
-  const d = document.createElement("div");
-  d.textContent = s;
-  return d.innerHTML;
-}
-
+function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
 function toast(msg) {
   const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.classList.add("show");
-  clearTimeout(el._timer);
-  el._timer = setTimeout(() => el.classList.remove("show"), 2500);
+  el.textContent = msg; el.classList.add("show");
+  clearTimeout(el._timer); el._timer = setTimeout(() => el.classList.remove("show"), 3000);
+}
+function showProgress(msg) {
+  document.getElementById("gpText").textContent = msg;
+  document.getElementById("gpFill").style.width = "0%";
+  document.getElementById("globalProgress").style.display = "block";
+}
+function hideProgress() { document.getElementById("globalProgress").style.display = "none"; }
+function setProgress(pct, msg) {
+  if (msg) document.getElementById("gpText").textContent = msg;
+  document.getElementById("gpFill").style.width = Math.min(pct, 100) + "%";
 }
 
-// Init
+// ── Graph ───────────────────────────────────────────────────────────────────
+
+async function renderGraph() {
+  if (graphInitialized) return;
+  const container = document.getElementById("graph");
+  const prog = document.getElementById("graphProgress");
+  const fill = document.getElementById("graphProgressFill");
+  const txt = document.getElementById("graphProgressText");
+
+  prog.style.display = "block";
+  fill.style.width = "10%";
+  txt.textContent = t("graphFetch");
+
+  if (typeof vis === "undefined") {
+    txt.textContent = "Error: vis-network no cargó. Recarga la página.";
+    fill.style.width = "0%";
+    return;
+  }
+
+  let data;
+  try {
+    data = await fetchJSON("/api/graph");
+  } catch(e) {
+    txt.textContent = "Error al cargar datos: " + e.message;
+    return;
+  }
+
+  fill.style.width = "40%";
+  txt.textContent = t("graphNodes");
+
+  if (data.nodes.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:3rem;color:#9ca3af">' + t("graphEmpty") + '</div>';
+    prog.style.display = "none";
+    return;
+  }
+
+  container.innerHTML = "";
+  const nodeColors = ["#3b82f6","#8b5cf6","#ef4444","#10b981","#f59e0b","#ec4899"];
+  const nodes = new vis.DataSet(data.nodes.map((n,i) => ({
+    id: n.id, label: n.label.length > 20 ? n.label.slice(0,20)+"…" : n.label,
+    title: n.title + (n.year ? " (" + n.year + ")" : ""),
+    shape: "dot", size: 12 + (data.edges.filter(e => e.from === n.id || e.to === n.id).length),
+    borderWidth: 1,
+    color: { background: nodeColors[i % nodeColors.length], border: "#1e293b" },
+    font: { size: 10, face: "-apple-system, sans-serif" },
+  })));
+
+  fill.style.width = "60%";
+  txt.textContent = t("graphEdges");
+
+  const edges = new vis.DataSet(data.edges.map(e => ({
+    from: e.from, to: e.to, title: e.title,
+    color: { color: "#94a3b8", opacity: 0.3 }, width: 1,
+  })));
+
+  fill.style.width = "75%";
+  txt.textContent = t("graphRender");
+  await new Promise(r => setTimeout(r, 30));
+
+  const options = {
+    physics: {
+      stabilization: { iterations: 80 },
+      solver: "forceAtlas2Based",
+      forceAtlas2Based: { gravitationalConstant: -30, springLength: 160, springConstant: 0.005 },
+    },
+    edges: { smooth: false },
+    interaction: { hover: true, tooltipDelay: 150 },
+  };
+
+  try {
+    network = new vis.Network(container, { nodes, edges }, options);
+    graphInitialized = true;
+    fill.style.width = "100%";
+    txt.textContent = t("graphReady");
+    setTimeout(() => { prog.style.display = "none"; }, 800);
+    network.once("stablePosition", () => {
+      network.setOptions({ physics: false });
+    });
+    network.on("click", function(params) {
+      if (params.nodes.length > 0) {
+        switchTab("papers");
+        document.getElementById("searchInput").value = "id:" + params.nodes[0];
+        render();
+      }
+    });
+  } catch(e) {
+    txt.textContent = "Error al renderizar grafo: " + e.message;
+  }
+}
+
+// ── Init ────────────────────────────────────────────────────────────────────
+
 (async () => {
+  const saved = localStorage.getItem("homearxiv_lang");
+  if (saved) { document.getElementById("langSelect").value = saved; setLang(saved); }
+  else setLang("es");
+
   await loadTags();
   await render();
+  const state = await fetchJSON("/api/resolve-progress");
+  if (state.running) {
+    document.getElementById("resolveProgress").style.display = "block";
+    progressInterval = setInterval(pollProgress, 600);
+  }
 })();
 </script>
 </body>
