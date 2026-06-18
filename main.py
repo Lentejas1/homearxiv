@@ -19,72 +19,6 @@ app = Flask(__name__)
 
 ARXIV_NS = {"atom": "http://www.w3.org/2005/Atom", "arxiv": "http://arxiv.org/schemas/atom"}
 
-ARXIV_CATEGORIES = {
-    "math.AC": "Commutative Algebra", "math.AG": "Algebraic Geometry", "math.AP": "Analysis of PDEs",
-    "math.AT": "Algebraic Topology", "math.CA": "Classical Analysis and ODEs", "math.CO": "Combinatorics",
-    "math.CT": "Category Theory", "math.CV": "Complex Variables", "math.DG": "Differential Geometry",
-    "math.DS": "Dynamical Systems", "math.FA": "Functional Analysis", "math.GM": "General Mathematics",
-    "math.GN": "General Topology", "math.GR": "Group Theory", "math.GT": "Geometric Topology",
-    "math.HO": "History and Overview", "math.IT": "Information Theory", "math.KT": "K-Theory and Homology",
-    "math.LO": "Logic", "math.MG": "Metric Geometry", "math.MP": "Mathematical Physics",
-    "math.NA": "Numerical Analysis", "math.NT": "Number Theory", "math.OA": "Operator Algebras",
-    "math.OC": "Optimization and Control", "math.PR": "Probability", "math.QA": "Quantum Algebra",
-    "math.RA": "Rings and Algebras", "math.RT": "Representation Theory", "math.SG": "Symplectic Geometry",
-    "math.SP": "Spectral Theory", "math.ST": "Statistics Theory",
-    "cs.AI": "Artificial Intelligence", "cs.AR": "Hardware Architecture", "cs.CC": "Computational Complexity",
-    "cs.CE": "Computational Engineering", "cs.CG": "Computational Geometry", "cs.CL": "Computation and Language",
-    "cs.CR": "Cryptography and Security", "cs.CV": "Computer Vision", "cs.CY": "Computers and Society",
-    "cs.DB": "Databases", "cs.DC": "Distributed Computing", "cs.DL": "Digital Libraries",
-    "cs.DS": "Data Structures and Algorithms", "cs.ET": "Emerging Technologies",
-    "cs.FL": "Formal Languages and Automata Theory", "cs.GL": "General Literature", "cs.GR": "Graphics",
-    "cs.GT": "Computer Science and Game Theory", "cs.HC": "Human-Computer Interaction",
-    "cs.IR": "Information Retrieval", "cs.IT": "Information Theory", "cs.LG": "Machine Learning",
-    "cs.LO": "Logic in Computer Science", "cs.MA": "Multiagent Systems", "cs.MM": "Multimedia",
-    "cs.MS": "Mathematical Software", "cs.NA": "Numerical Analysis", "cs.NE": "Neural and Evolutionary Computing",
-    "cs.NI": "Networking and Internet Architecture", "cs.OS": "Operating Systems", "cs.PF": "Performance",
-    "cs.PL": "Programming Languages", "cs.RO": "Robotics", "cs.SC": "Symbolic Computation",
-    "cs.SD": "Sound", "cs.SE": "Software Engineering", "cs.SI": "Social and Information Networks",
-    "cs.SY": "Systems and Control",
-    "physics.acc-ph": "Accelerator Physics", "physics.ao-ph": "Atmospheric and Oceanic Physics",
-    "physics.app-ph": "Applied Physics", "physics.atm-clus": "Atomic and Molecular Clusters",
-    "physics.atom-ph": "Atomic Physics", "physics.bio-ph": "Biological Physics",
-    "physics.chem-ph": "Chemical Physics", "physics.class-ph": "Classical Physics",
-    "physics.comp-ph": "Computational Physics", "physics.data-an": "Data Analysis and Statistics",
-    "physics.flu-dyn": "Fluid Dynamics", "physics.gen-ph": "General Physics", "physics.geo-ph": "Geophysics",
-    "physics.hist-ph": "History and Philosophy of Physics", "physics.ins-det": "Instrumentation and Detectors",
-    "physics.med-ph": "Medical Physics", "physics.optics": "Optics", "physics.plasm-ph": "Plasma Physics",
-    "physics.pop-ph": "Popular Physics", "physics.soc-ph": "Physics and Society",
-    "physics.space-ph": "Space Physics",
-    "astro-ph.CO": "Cosmology and Nongalactic Astrophysics", "astro-ph.EP": "Earth and Planetary Astrophysics",
-    "astro-ph.GA": "Astrophysics of Galaxies", "astro-ph.HE": "High Energy Astrophysics",
-    "astro-ph.IM": "Instrumentation and Methods for Astrophysics", "astro-ph.SR": "Solar and Stellar Astrophysics",
-    "cond-mat.dis-nn": "Disordered Systems and Neural Networks",
-    "cond-mat.mes-hall": "Mesoscale and Nanoscale Physics", "cond-mat.mtrl-sci": "Materials Science",
-    "cond-mat.other": "Other Condensed Matter", "cond-mat.quant-gas": "Quantum Gases",
-    "cond-mat.soft": "Soft Condensed Matter", "cond-mat.stat-mech": "Statistical Mechanics",
-    "cond-mat.str-el": "Strongly Correlated Electrons", "cond-mat.supr-con": "Superconductivity",
-    "gr-qc": "General Relativity and Quantum Cosmology", "hep-ex": "High Energy Physics - Experiment",
-    "hep-lat": "High Energy Physics - Lattice", "hep-ph": "High Energy Physics - Phenomenology",
-    "hep-th": "High Energy Physics - Theory", "math-ph": "Mathematical Physics",
-    "nlin.AO": "Adaptation and Self-Organizing Systems", "nlin.CD": "Chaotic Dynamics",
-    "nlin.CG": "Cellular Automata and Lattice Gases", "nlin.PS": "Pattern Formation and Solitons",
-    "nlin.SI": "Exactly Solvable and Integrable Systems", "nucl-ex": "Nuclear Experiment",
-    "nucl-th": "Nuclear Theory",
-    "q-bio.BM": "Biomolecules", "q-bio.CB": "Cell Behavior", "q-bio.GN": "Genomics",
-    "q-bio.MN": "Molecular Networks", "q-bio.NC": "Neurons and Cognition", "q-bio.OT": "Other Quantitative Biology",
-    "q-bio.PE": "Populations and Evolution", "q-bio.QM": "Quantitative Methods",
-    "q-bio.SC": "Subcellular Processes", "q-bio.TO": "Tissues and Organs",
-    "q-fin.CP": "Computational Finance", "q-fin.EC": "Economics", "q-fin.GN": "General Finance",
-    "q-fin.MF": "Mathematical Finance", "q-fin.PM": "Portfolio Management",
-    "q-fin.PR": "Pricing of Securities", "q-fin.RM": "Risk Management", "q-fin.ST": "Statistical Finance",
-    "q-fin.TR": "Trading and Market Microstructure",
-    "stat.AP": "Statistics - Applications", "stat.CO": "Statistics - Computation",
-    "stat.ME": "Statistics - Methodology", "stat.ML": "Statistics - Machine Learning",
-    "stat.OT": "Statistics - Other", "stat.TH": "Statistics - Theory",
-    "eess.AS": "Audio and Speech Processing", "eess.IV": "Image and Video Processing",
-    "eess.SP": "Signal Processing", "eess.SY": "Systems and Control",
-}
-
 # ── Global resolve progress ──────────────────────────────────────────────────
 
 resolve_state = {"running": False, "total": 0, "current": 0, "current_id": None, "current_label": ""}
@@ -301,7 +235,39 @@ def resolve_isbn(isbn):
     return {"title": title, "author": author, "year": year, "doi": clean, "source": "isbn", "abstract": None}
 
 
-def resolve_any(identifier):
+def resolve_crossref_search(query):
+    if not query or len(query) < 10:
+        return None
+    q = re.sub(r"[^a-zA-Z0-9\s]", " ", query).strip()
+    q = re.sub(r"\s+", " ", q).strip()
+    if len(q) < 10:
+        return None
+    req = Request(f"https://api.crossref.org/works?query.title={q.replace(' ', '+')}&rows=1",
+                  headers={"User-Agent": "HomeArxiv/1.0 (mailto:user@example.com)"})
+    try:
+        with urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode())
+    except Exception:
+        return None
+    items = data.get("message", {}).get("items", [])
+    if not items:
+        return None
+    msg = items[0]
+    title = (msg.get("title") or [None])[0]
+    if not title:
+        return None
+    authors = msg.get("author", [])
+    author = ", ".join(f"{a.get('given','')} {a.get('family','')}".strip() for a in authors if a.get("family")) or None
+    dp = (msg.get("published-print",{}).get("date-parts") or msg.get("published-online",{}).get("date-parts") or msg.get("created",{}).get("date-parts") or [])
+    year = dp[0][0] if dp and dp[0] else None
+    doi = msg.get("DOI")
+    abstract = msg.get("abstract", "")
+    if abstract:
+        abstract = re.sub(r"<[^>]+>", "", abstract).strip()
+    return {"title": title, "author": author, "year": year, "doi": doi, "source": "crossref", "abstract": abstract or None}
+
+
+def resolve_any(identifier, title_fallback=None):
     cleaned = clean_title(identifier)
     if is_doi(cleaned):
         return resolve_doi(cleaned)
@@ -312,6 +278,9 @@ def resolve_any(identifier):
         return result
     if is_arxiv_id(cleaned):
         return resolve_arxiv(normalize_arxiv_id(cleaned))
+    result = resolve_crossref_search(title_fallback or cleaned)
+    if result:
+        return result
     return None
 
 
@@ -319,14 +288,29 @@ def resolve_any(identifier):
 
 def extract_pdf_text(path):
     try:
-        import fitz
-        doc = fitz.open(path)
-        text = ""
-        for page in doc:
-            text += page.get_text()
-            if len(text) > 8000:
-                break
-        doc.close()
+        import fitz, os, sys
+        old_stderr = os.dup(sys.stderr.fileno())
+        old_stdout = os.dup(sys.stdout.fileno())
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, sys.stderr.fileno())
+        os.dup2(devnull, sys.stdout.fileno())
+        try:
+            doc = fitz.open(path)
+            text = ""
+            for page in doc:
+                try:
+                    text += page.get_text()
+                except Exception:
+                    pass
+                if len(text) > 8000:
+                    break
+            doc.close()
+        finally:
+            os.dup2(old_stderr, sys.stderr.fileno())
+            os.dup2(old_stdout, sys.stdout.fileno())
+            os.close(old_stderr)
+            os.close(old_stdout)
+            os.close(devnull)
         return text
     except Exception:
         return None
@@ -345,6 +329,7 @@ def parse_abstract(text):
 
 
 _STOPWORDS = set("the a an is in on at of to for with by and or not be are was were has have had its their this that from as it he she they we you".split())
+_COMMON_WORDS = set("abstract acknowledgements acknowledgment acknowledgments introduction conclusion conclusions references bibliography appendix figure figures table tables funding declaration competing interests available preprint submitted published copyright license permission et al".lower().split())
 
 def _extract_keywords(text):
     if not text:
@@ -366,7 +351,7 @@ def _extract_keywords(text):
     keywords = []
     for c in candidates:
         c = c.strip(" \t.,;:-()\"'[]").strip().lower()
-        if len(c) > 2 and c not in _STOPWORDS and len(c) < 80:
+        if len(c) > 2 and not re.match(r"^\d+$", c) and (sum(ch.isdigit() for ch in c) / max(len(c), 1)) < 0.5 and c not in _STOPWORDS and c not in _COMMON_WORDS and len(c) < 80 and "@" not in c and not re.search(r"[./\\]", c) and not re.match(r"^[a-zA-Z]\d+$", c) and len(c.split()) <= 3:
             keywords.append(c)
     return keywords[:20]
 
@@ -413,17 +398,29 @@ def scan_papers():
 
 def extract_pdf_metadata(path):
     try:
-        import fitz
-        doc = fitz.open(path)
-        meta = doc.metadata
-        title = meta.get("title", "").strip()
-        author = meta.get("author", "").strip()
-        year_str = ""
-        if meta.get("creationDate"):
-            m = re.search(r"D:(\d{4})", meta["creationDate"])
-            if m:
-                year_str = m.group(1)
-        doc.close()
+        import fitz, os, sys
+        old_stderr = os.dup(sys.stderr.fileno())
+        old_stdout = os.dup(sys.stdout.fileno())
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, sys.stderr.fileno())
+        os.dup2(devnull, sys.stdout.fileno())
+        try:
+            doc = fitz.open(path)
+            meta = doc.metadata
+            title = meta.get("title", "").strip()
+            author = meta.get("author", "").strip()
+            year_str = ""
+            if meta.get("creationDate"):
+                m = re.search(r"D:(\d{4})", meta["creationDate"])
+                if m:
+                    year_str = m.group(1)
+            doc.close()
+        finally:
+            os.dup2(old_stderr, sys.stderr.fileno())
+            os.dup2(old_stdout, sys.stdout.fileno())
+            os.close(old_stderr)
+            os.close(old_stdout)
+            os.close(devnull)
         return title or None, author or None, int(year_str) if year_str else None
     except ImportError:
         return None, None, None
@@ -465,6 +462,29 @@ def resolve_existing_unresolved():
             resolve_state["current_id"] = r["id"]
             resolve_state["current_label"] = identifier
             if not is_doi(identifier) and not is_arxiv_id(identifier) and not is_isbn(identifier):
+                print(f"  [{idx}/{len(candidates)}] Buscando '{identifier}' en Crossref...", flush=True)
+                result = resolve_crossref_search(identifier)
+                if result and result.get("title"):
+                    conn.execute(
+                        "UPDATE documents SET title=?, author=?, year=?, doi=?, abstract=?, updated_at=? WHERE id=?",
+                        (result["title"], result["author"], result["year"], result["doi"],
+                         result.get("abstract"), datetime.now().isoformat(), r["id"]),
+                    )
+                    if result.get("abstract"):
+                        _, keywords = parse_abstract(result["abstract"])
+                        for kw in keywords:
+                            conn.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (kw,))
+                            tag = conn.execute("SELECT id FROM tags WHERE name = ?", (kw,)).fetchone()
+                            if tag:
+                                conn.execute("INSERT OR IGNORE INTO document_tags (document_id, tag_id) VALUES (?, ?)", (r["id"], tag[0]))
+                    doc_type = detect_doc_type(result.get("doi"), result.get("title"), "")
+                    conn.execute("UPDATE documents SET doc_type=? WHERE id=?", (doc_type, r["id"]))
+                    conn.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (doc_type,))
+                    tt = conn.execute("SELECT id FROM tags WHERE name = ?", (doc_type,)).fetchone()
+                    if tt:
+                        conn.execute("INSERT OR IGNORE INTO document_tags (document_id, tag_id) VALUES (?, ?)", (r["id"], tt[0]))
+                    updated += 1
+                    print(f"    -> {result['title'][:60]}", flush=True)
                 continue
             print(f"  [{idx}/{len(candidates)}] Resolviendo '{identifier}'...", flush=True)
             result = resolve_any(identifier)
@@ -483,9 +503,8 @@ def resolve_existing_unresolved():
                             conn.execute("INSERT OR IGNORE INTO document_tags (document_id, tag_id) VALUES (?, ?)", (r["id"], tag[0]))
                 cat = result.get("category")
                 if cat:
-                    cat_name = ARXIV_CATEGORIES.get(cat, cat)
-                    conn.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (cat_name,))
-                    ct = conn.execute("SELECT id FROM tags WHERE name = ?", (cat_name,)).fetchone()
+                    conn.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (cat,))
+                    ct = conn.execute("SELECT id FROM tags WHERE name = ?", (cat,)).fetchone()
                     if ct:
                         conn.execute("INSERT OR IGNORE INTO document_tags (document_id, tag_id) VALUES (?, ?)", (r["id"], ct[0]))
                 doc_type = detect_doc_type(result.get("doi"), result.get("title"), "")
@@ -616,9 +635,8 @@ def resolve_document(doc_id):
                 conn.execute("INSERT OR IGNORE INTO document_tags (document_id, tag_id) VALUES (?, ?)", (doc_id, tag[0]))
     cat = result.get("category")
     if cat:
-        cat_name = ARXIV_CATEGORIES.get(cat, cat)
-        conn.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (cat_name,))
-        ct = conn.execute("SELECT id FROM tags WHERE name = ?", (cat_name,)).fetchone()
+        conn.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (cat,))
+        ct = conn.execute("SELECT id FROM tags WHERE name = ?", (cat,)).fetchone()
         if ct:
             conn.execute("INSERT OR IGNORE INTO document_tags (document_id, tag_id) VALUES (?, ?)", (doc_id, ct[0]))
     doc_type = detect_doc_type(result.get("doi"), result.get("title"), "")
@@ -668,19 +686,30 @@ def retag_all():
     return jsonify({"ok": True, "documents": len(docs)})
 
 
+def _get_arxiv_category(doc, conn):
+    if doc["category"]:
+        return doc["category"]
+    doi = doc["doi"] or ""
+    if is_arxiv_id(doi) or re.match(r"^\d{4}\.\d{4,5}$", doi):
+        time.sleep(0.3)
+        result = resolve_arxiv(doi)
+        if result and result.get("category"):
+            conn.execute("UPDATE documents SET category=? WHERE id=?", (result["category"], doc["id"]))
+            return result["category"]
+    return None
+
+
 def _retag_single(d, conn):
-    text = d["abstract"]
-    pdf_text = None
-    if not text:
-        pdf_text = extract_pdf_text(d["path"])
-        if pdf_text:
-            text = pdf_text
-    _, keywords = parse_abstract(text) if text else (None, [])
-    if not keywords and text:
-        words = re.findall(r"[a-zA-Z]\w{3,}", text.lower())
+    full = d["abstract"] or ""
+    pdf_text = extract_pdf_text(d["path"])
+    if pdf_text:
+        full = full + "\n" + pdf_text
+    _, keywords = parse_abstract(full) if full else (None, [])
+    if not keywords and full:
+        words = re.findall(r"[a-zA-Z]\w{3,}", full.lower())
         word_counts = {}
         for w in words:
-            if w not in _STOPWORDS:
+            if w not in _STOPWORDS and w not in _COMMON_WORDS and (sum(c.isdigit() for c in w) / max(len(w), 1)) < 0.5 and not re.match(r"^[a-zA-Z]\d+$", w) and "@" not in w and not re.search(r"[./\\]", w):
                 word_counts[w] = word_counts.get(w, 0) + 1
         sorted_words = sorted(word_counts.items(), key=lambda x: -x[1])
         keywords = [w for w, c in sorted_words[:15] if len(w) > 3]
@@ -690,11 +719,10 @@ def _retag_single(d, conn):
         t = conn.execute("SELECT id FROM tags WHERE name = ?", (kw,)).fetchone()
         if t:
             conn.execute("INSERT OR IGNORE INTO document_tags (document_id, tag_id) VALUES (?, ?)", (d["id"], t[0]))
-    cat = d["category"]
+    cat = _get_arxiv_category(d, conn)
     if cat:
-        cat_name = ARXIV_CATEGORIES.get(cat, cat)
-        conn.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (cat_name,))
-        ct = conn.execute("SELECT id FROM tags WHERE name = ?", (cat_name,)).fetchone()
+        conn.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (cat,))
+        ct = conn.execute("SELECT id FROM tags WHERE name = ?", (cat,)).fetchone()
         if ct:
             conn.execute("INSERT OR IGNORE INTO document_tags (document_id, tag_id) VALUES (?, ?)", (d["id"], ct[0]))
     return keywords
@@ -807,6 +835,11 @@ def graph_data():
 
 
 if __name__ == "__main__":
+    try:
+        import fitz, io
+        fitz.set_messages(stream=io.StringIO())
+    except Exception:
+        pass
     print("HomeArxiv iniciando...", flush=True)
     init_db()
     scan_papers()
